@@ -19,7 +19,7 @@ export async function onRequestPost(context) {
         {
           topic: "konvy-logs",
           event: "log-event",
-          payload: logData
+          payload: { data: logData }
         }
       ]
     };

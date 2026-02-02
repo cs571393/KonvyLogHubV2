@@ -119,7 +119,8 @@
         channel
             .on('broadcast', { event: 'log-event' }, ({ payload }) => {
                 try {
-                    const parsed = payload;
+                    // 后端现在包裹了一层 { data: ... } 以避免 422 错误
+                    const parsed = payload.data || payload; 
                     if (Array.isArray(parsed)) {
                         parsed.forEach(item => processItem(item));
                     } else {

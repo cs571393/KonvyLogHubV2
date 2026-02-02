@@ -32,7 +32,7 @@ export default {
           {
             topic: "konvy-logs",
             event: "log-event",
-            payload: logData
+            payload: { data: logData }
           }
         ]
       };
