@@ -15,9 +15,13 @@ export async function onRequestPost(context) {
     const supabaseKey = env.SUPABASE_ANON_KEY;
     
     const broadcastPayload = {
-      topic: "konvy-logs",
-      event: "log-event",
-      payload: logData
+      messages: [
+        {
+          topic: "konvy-logs",
+          event: "log-event",
+          payload: logData
+        }
+      ]
     };
 
     const supabaseRes = await fetch(`${supabaseUrl}/realtime/v1/api/broadcast`, {

@@ -97,9 +97,20 @@
         } catch (e) { console.error("Restore failed", e); }
 
         const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+            realtime: {
+                params: {
+                    eventsPerSecond: 10
+                }
+            }
+        });
+        
+        // 强制使用 Long Polling (如果环境不支持 WebSocket 或网络不稳定)
+        // 注意：目前 Supabase JS SDK 默认会自动降级，但我们可以手动配置
         const channel = _supabase.channel('konvy-logs', {
-            config: { broadcast: { self: false } }
+            config: { 
+                broadcast: { self: false }
+            }
         });
 
         // 初始化显示
@@ -117,8 +128,17 @@
                     refreshDisplay();
                 } catch (e) { console.error(e); }
             })
-            .subscribe((status) => {
-                document.getElementById('status').innerText = 'Status: ' + status;
+            .subscribe((status, err) => {
+                let msg = 'Status: ' + status;
+                if (status === 'CHANNEL_ERROR' && err) {
+                    console.error('Realtime Error:', err);
+                    msg += ' (' + (err.message || JSON.stringify(err)) + ')';
+                }
+                document.getElementById('status').innerText = msg;
+                
+                if (status === 'SUBSCRIBED') {
+                    console.log('Successfully connected to Supabase Realtime');
+                }
             });
 
         function processItem(log) {
